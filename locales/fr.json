@@ -1,6 +1,7 @@
 {
   "ui_use": "Utiliser",
   "ui_give": "Donner",
+  "ui_rename": "Renommer",
   "ui_close": "Fermer",
   "ui_drop": "Jeter",
   "ui_removeattachments": "Retirer des accessoires",

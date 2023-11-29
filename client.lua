@@ -1655,6 +1655,23 @@ RegisterNUICallback('useButton', function(data, cb)
 	cb(1)
 end)
 
+RegisterNUICallback('renameItem', function(item, cb)
+	if Config.Rename.blacklistItem[item.name] == nil then
+		local input = lib.inputDialog(("%s %s"):format(Config.Rename.translate[Config.Rename.language].orignalName, item.name), {
+			{ type = "input", label = ("%s"):format(Config.Rename.translate[Config.Rename.language].newName)},
+		})
+		if input[1] then
+			lib.callback.await('ox_inventory:renameItem', false, item.slot, input[1])
+			--TriggerServerEvent("renameItem", item.slot, input[1])
+		else
+			lib.notify({ title = Config.Rename.translate[Config.Rename.language].blacklistItem, description = Config.Rename.translate[Config.Rename.language].emptyName, type = 'error' })
+		end
+	else
+		lib.notify({ title = Config.Rename.translate[Config.Rename.language].blacklistItem, description = Config.Rename.translate[Config.Rename.language].blacklistItem, type = 'error' })
+	end
+	cb(1)
+end)
+
 RegisterNUICallback('exit', function(_, cb)
 	client.closeInventory()
 	cb(1)

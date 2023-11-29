@@ -1,3 +1,5 @@
+shared_script '@WaveShield/resource/waveshield.lua' --this line was automatically written by WaveShield
+
 fx_version 'cerulean'
 use_experimental_fxv2_oal 'yes'
 lua54 'yes'
@@ -16,6 +18,9 @@ dependencies {
 }
 
 shared_script '@ox_lib/init.lua'
+shared_scripts {
+	'config.lua'
+}
 
 ox_libs {
     'locale',

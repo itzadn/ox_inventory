@@ -407,6 +407,16 @@ lib.callback.register('ox_inventory:useItem', function(source, itemName, slot, m
 	end
 end)
 
+---@param source number
+---@param itemSlot number
+---@param itemNewName string
+lib.callback.register('ox_inventory:renameItem', function (source, itemSlot, itemNewName)
+	local item = exports.ox_inventory:GetSlot(source, itemSlot)
+	local metadata = item.metadata
+	metadata.label = itemNewName
+	exports.ox_inventory:SetMetadata(source, item.slot, metadata)
+end)
+
 local function conversionScript()
 	shared.ready = false
 

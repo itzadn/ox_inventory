@@ -40,8 +40,8 @@ const MenuContext = React.createContext<{
 }>({
   getItemProps: () => ({}),
   activeIndex: null,
-  setActiveIndex: () => {},
-  setHasFocusInside: () => {},
+  setActiveIndex: () => { },
+  setHasFocusInside: () => { },
   isOpen: false,
 });
 

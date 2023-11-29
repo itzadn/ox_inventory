@@ -109,7 +109,7 @@ const InventorySlot: React.ForwardRefRenderFunction<HTMLDivElement, SlotProps> =
 
   const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
     dispatch(closeTooltip());
-    if (timerRef.current) clearTimeout(timerRef.current);
+    if (timerRef.current) clearTimeout(timerRef.current as NodeJS.Timeout);
     if (event.ctrlKey && isSlotWithItem(item) && inventoryType !== 'shop' && inventoryType !== 'crafting') {
       onDrop({ item: item, inventory: inventoryType });
     } else if (event.altKey && isSlotWithItem(item) && inventoryType === 'player') {
@@ -124,7 +124,7 @@ const InventorySlot: React.ForwardRefRenderFunction<HTMLDivElement, SlotProps> =
       ref={refs}
       onContextMenu={handleContext}
       onClick={handleClick}
-      className="inventory-slot"
+      className={`inventory-slot ${!isSlotWithItem(item) && 'inventory-slot--empty'}`}
       style={{
         filter:
           !canPurchaseItem(item, { type: inventoryType, groups: inventoryGroups }) || !canCraftItem(item, inventoryType)
@@ -132,7 +132,7 @@ const InventorySlot: React.ForwardRefRenderFunction<HTMLDivElement, SlotProps> =
             : undefined,
         opacity: isDragging ? 0.4 : 1.0,
         backgroundImage: `url(${item?.name ? getItemUrl(item as SlotWithItem) : 'none'}`,
-        border: isOver ? '1px dashed rgba(255,255,255,0.4)' : '',
+        border: isOver ? '1px solid rgba(34, 197, 94,0.4)' : '',
       }}
     >
       {isSlotWithItem(item) && (
@@ -146,36 +146,45 @@ const InventorySlot: React.ForwardRefRenderFunction<HTMLDivElement, SlotProps> =
           onMouseLeave={() => {
             dispatch(closeTooltip());
             if (timerRef.current) {
-              clearTimeout(timerRef.current);
+              clearTimeout(timerRef.current as NodeJS.Timeout);
               timerRef.current = null;
             }
           }}
         >
           <div
-            className={
-              inventoryType === 'player' && item.slot <= 5 ? 'item-hotslot-header-wrapper' : 'item-slot-header-wrapper'
-            }
+            className={`px-1 pt-1 flex items-center justify-between flex-wrap gap-1`}
           >
-            {inventoryType === 'player' && item.slot <= 5 && <div className="inventory-slot-number">{item.slot}</div>}
-            <div className="item-slot-info-wrapper">
-              <p>
-                {item.weight > 0
-                  ? item.weight >= 1000
+            {item.weight > 0 && (
+              <span className='inventory-weight'>
+                {
+                  item.weight >= 1000
                     ? `${(item.weight / 1000).toLocaleString('en-us', {
-                        minimumFractionDigits: 2,
-                      })}kg `
+                      maximumFractionDigits: 1
+                    })} kg `
                     : `${item.weight.toLocaleString('en-us', {
-                        minimumFractionDigits: 0,
-                      })}g `
-                  : ''}
-              </p>
-              <p>{item.count ? item.count.toLocaleString('en-us') + `x` : ''}</p>
-            </div>
-          </div>
-          <div>
-            {inventoryType !== 'shop' && item?.durability !== undefined && (
-              <WeightBar percent={item.durability} durability />
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 1
+                    })} g `
+                }
+              </span>
             )}
+
+            {item.count && (
+              <span className={`inventory-weight ${item.name == 'money' ? 'inventory-weight--money' : 'inventory-weight--amount'}`}>
+                {item.count.toLocaleString('en-us') + ` ${item.name == 'money' ? '$' : 'x'}`}
+              </span>
+            )}
+          </div>
+
+          <div>
+            <div className="px-0.5 pb-0.5 flex items-center justify-between flex-wrap gap-1">
+              <div className="inventory-slot-label-box">
+                <div className="inventory-slot-label-text">
+                  {item.metadata?.label ? item.metadata.label : Items[item.name]?.label || item.name}
+                </div>
+              </div>
+            </div>
+
             {inventoryType === 'shop' && item?.price !== undefined && (
               <>
                 {item?.currency !== 'money' && item.currency !== 'black_money' && item.price > 0 && item.currency ? (
@@ -197,8 +206,7 @@ const InventorySlot: React.ForwardRefRenderFunction<HTMLDivElement, SlotProps> =
                   <>
                     {item.price > 0 && (
                       <div
-                        className="item-slot-price-wrapper"
-                        style={{ color: item.currency === 'money' || !item.currency ? '#2ECC71' : '#E74C3C' }}
+                        className={`item-slot-price-wrapper ${item.currency === 'money' || !item.currency ? 'text-green-400' : 'text-red-400'}`}
                       >
                         <p>
                           {Locale.$ || '$'}
@@ -210,11 +218,10 @@ const InventorySlot: React.ForwardRefRenderFunction<HTMLDivElement, SlotProps> =
                 )}
               </>
             )}
-            <div className="inventory-slot-label-box">
-              <div className="inventory-slot-label-text">
-                {item.metadata?.label ? item.metadata.label : Items[item.name]?.label || item.name}
-              </div>
-            </div>
+
+            {inventoryType !== 'shop' && item?.durability !== undefined && (
+              <WeightBar percent={item.durability} durability />
+            )}
           </div>
         </div>
       )}
